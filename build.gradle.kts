@@ -31,7 +31,7 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-web")
 
-    implementation("com.kaiqkt.commons:commons-crypto:1.10.0")
+    implementation("com.kaiqkt.commons:commons-crypto:1.0.0")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("javax.servlet:javax.servlet-api")
