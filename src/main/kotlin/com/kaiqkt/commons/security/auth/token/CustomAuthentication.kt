@@ -8,8 +8,6 @@ class CustomAuthentication(val accessToken: String) : Authentication {
     private val grantedAuthority = mutableListOf<GrantedAuthority>()
     var id: String? = null
     var sessionId: String? = null
-    var refreshToken: String? = null
-    var isExpired = false
 
     override fun setAuthenticated(isAuthenticated: Boolean) {
         this.authenticated = isAuthenticated
@@ -17,9 +15,9 @@ class CustomAuthentication(val accessToken: String) : Authentication {
 
     override fun isAuthenticated(): Boolean = this.authenticated
 
-    override fun getDetails(): Any = ""
+    override fun getDetails(): Any = "UNKNOWN"
 
-    override fun getName(): String = "AuthenticationToken"
+    override fun getName(): String = "AUTHENTICATION_TOKEN"
 
     override fun getAuthorities(): MutableCollection<GrantedAuthority> = grantedAuthority
 

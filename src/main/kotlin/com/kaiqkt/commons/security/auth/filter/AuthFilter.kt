@@ -17,8 +17,6 @@ import javax.servlet.http.HttpServletResponse
 
 
 const val BEARER_PREFIX = "Bearer "
-const val REFRESH_TOKEN_PREFIX = "Refresh-Token"
-private const val SESSION_VALIDATE_PATH = "/auth/validate"
 
 class AuthFilter(
     private val authProperties: AuthProperties,
@@ -29,7 +27,6 @@ class AuthFilter(
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
         val path = request.servletPath
         val accessTokenHeader = request.getHeader(AUTHORIZATION)
-        val refreshTokenHeader = request.getHeader(REFRESH_TOKEN_PREFIX)
 
         if (accessTokenHeader.isNullOrBlank()) {
             chain.doFilter(request, response)
@@ -38,14 +35,10 @@ class AuthFilter(
                 val customerAuth = CustomAuthentication(accessTokenHeader)
 
                 val authResult = when {
-                    !refreshTokenHeader.isNullOrBlank() && accessTokenHeader.startsWith(BEARER_PREFIX) && path.startsWith(SESSION_VALIDATE_PATH) -> {
-                        customerAuth.refreshToken = refreshTokenHeader
-                        CustomerAuthProvider(authProperties).handleCustomerAuth(customerAuth, true)
-                    }
-
-                    accessTokenHeader.startsWith(BEARER_PREFIX) && !path.startsWith(SESSION_VALIDATE_PATH) -> CustomerAuthProvider(
+                    accessTokenHeader.startsWith(BEARER_PREFIX)->
+                        CustomerAuthProvider(
                         authProperties
-                    ).handleCustomerAuth(customerAuth, false)
+                    ).handleCustomerAuth(customerAuth)
 
                     else -> ServiceAuthProvider(authProperties).handleServiceAuth(customerAuth)
                 }
