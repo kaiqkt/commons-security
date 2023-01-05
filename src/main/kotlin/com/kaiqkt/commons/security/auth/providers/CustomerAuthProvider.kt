@@ -1,6 +1,7 @@
 package com.kaiqkt.commons.security.auth.providers
 
 import com.kaiqkt.commons.crypto.jwt.JWTUtils
+import com.kaiqkt.commons.security.auth.exceptions.JwtExpiredException
 import com.kaiqkt.commons.security.auth.filter.BEARER_PREFIX
 import com.kaiqkt.commons.security.auth.properties.AuthProperties
 import com.kaiqkt.commons.security.auth.token.CustomAuthentication
@@ -19,7 +20,7 @@ class CustomerAuthProvider(private val properties: AuthProperties) {
         authentication.id = token.id
         token.authorities.map { authentication.authorities.add(SimpleGrantedAuthority(it)) }
         authentication.sessionId = token.sessionId
-        authentication.isAuthenticated = !token.expired
+        authentication.isAuthenticated = if (token.expired) throw JwtExpiredException() else true
 
         return authentication
     }
