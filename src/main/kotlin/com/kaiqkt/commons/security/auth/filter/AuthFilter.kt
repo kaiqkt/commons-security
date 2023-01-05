@@ -1,5 +1,8 @@
 package com.kaiqkt.commons.security.auth.filter
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.kaiqkt.commons.security.auth.entities.Error
+import com.kaiqkt.commons.security.auth.exceptions.JwtExpiredException
 import com.kaiqkt.commons.security.auth.properties.AuthProperties
 import com.kaiqkt.commons.security.auth.providers.CustomerAuthProvider
 import com.kaiqkt.commons.security.auth.providers.ServiceAuthProvider
@@ -14,7 +17,6 @@ import javax.servlet.FilterChain
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-
 
 const val BEARER_PREFIX = "Bearer "
 
@@ -35,19 +37,27 @@ class AuthFilter(
                 val customerAuth = CustomAuthentication(accessTokenHeader)
 
                 val authResult = when {
-                    accessTokenHeader.startsWith(BEARER_PREFIX)->
+                    accessTokenHeader.startsWith(BEARER_PREFIX) ->
                         CustomerAuthProvider(
-                        authProperties
-                    ).handleCustomerAuth(customerAuth)
+                            authProperties
+                        ).handleCustomerAuth(customerAuth)
 
                     else -> ServiceAuthProvider(authProperties).handleServiceAuth(customerAuth)
                 }
 
                 SecurityContextHolder.getContext().authentication = authResult
-
                 onSuccessfulAuthentication(request, response, authResult)
             } catch (e: AuthenticationException) {
                 SecurityContextHolder.clearContext()
+
+                if (e is JwtExpiredException) {
+                    val error = jacksonObjectMapper().writeValueAsString(Error())
+
+                    response.contentType = "application/vnd.kaiqkt_error_v1+json"
+                    response.status = HttpServletResponse.SC_UNAUTHORIZED
+                    response.outputStream.println(error)
+                }
+
                 onUnsuccessfulAuthentication(request, response, e)
             } finally {
                 chain.doFilter(request, response)
