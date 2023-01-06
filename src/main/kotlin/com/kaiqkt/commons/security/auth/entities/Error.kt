@@ -1,6 +1,8 @@
 package com.kaiqkt.commons.security.auth.entities
 
+import com.kaiqkt.commons.security.auth.exceptions.ErrorType
+
 data class Error(
-    val type: String = "TOKEN_EXPIRED",
-    val message: String = "Access token expired"
+    val type: ErrorType,
+    val message: String
 )
