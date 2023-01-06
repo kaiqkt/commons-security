@@ -1,14 +1,18 @@
 package com.kaiqkt.commons.security.auth.filter
 
+import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kaiqkt.commons.security.auth.entities.Error
+import com.kaiqkt.commons.security.auth.exceptions.ErrorType
 import com.kaiqkt.commons.security.auth.exceptions.JwtExpiredException
 import com.kaiqkt.commons.security.auth.properties.AuthProperties
 import com.kaiqkt.commons.security.auth.providers.CustomerAuthProvider
 import com.kaiqkt.commons.security.auth.providers.ServiceAuthProvider
 import com.kaiqkt.commons.security.auth.token.CustomAuthentication
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
@@ -50,12 +54,18 @@ class AuthFilter(
             } catch (e: AuthenticationException) {
                 SecurityContextHolder.clearContext()
 
-                if (e is JwtExpiredException) {
-                    val error = jacksonObjectMapper().writeValueAsString(Error())
+                response.contentType = "application/vnd.kaiqkt_error_v1+json"
+                response.status = HttpServletResponse.SC_UNAUTHORIZED
 
-                    response.contentType = "application/vnd.kaiqkt_error_v1+json"
-                    response.status = HttpServletResponse.SC_UNAUTHORIZED
-                    response.outputStream.println(error)
+                when (e) {
+                    is JwtExpiredException -> {
+                        val error = Error(ErrorType.ACCESS_TOKEN_EXPIRED, "Access token expired")
+                        response.outputStream.println(jacksonObjectMapper().writeValueAsString(error))
+                    }
+                    is BadCredentialsException -> {
+                        val error = Error(ErrorType.INVALID_SERVICE_TOKEN, "Invalid service token")
+                        response.outputStream.println(jacksonObjectMapper().writeValueAsString(error))
+                    }
                 }
 
                 onUnsuccessfulAuthentication(request, response, e)
