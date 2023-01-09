@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "com.kaiqkt.commons"
-version = "1.0.9"
+version = "1.0.10"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
