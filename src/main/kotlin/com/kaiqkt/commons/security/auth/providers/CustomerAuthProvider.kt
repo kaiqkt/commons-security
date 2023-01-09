@@ -16,15 +16,16 @@ class CustomerAuthProvider(private val properties: AuthProperties) {
         val secret =
             properties.customerAuthSigningSecret ?: throw SecretNotProvidedException("Customer secret is not provided")
 
-        try {
-            val token = JWTUtils.getClaims(accessToken, secret)
-            authentication.id = token.id
-            token.authorities.map { authentication.authorities.add(SimpleGrantedAuthority(it)) }
-            authentication.sessionId = token.sessionId
-            authentication.isAuthenticated = true
-        }catch (ex: Exception) {
+        val token = try {
+            JWTUtils.getClaims(accessToken, secret)
+        } catch (ex: Exception) {
             throw JwtExpiredException()
         }
+
+        authentication.id = token.id
+        token.authorities.map { authentication.authorities.add(SimpleGrantedAuthority(it)) }
+        authentication.sessionId = token.sessionId
+        authentication.isAuthenticated = true
 
         return authentication
     }
