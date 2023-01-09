@@ -25,7 +25,7 @@ class SecurityWebServletConfiguration(
     override fun configure(http: HttpSecurity) {
         http
             .exceptionHandling().apply {
-                authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                authenticationEntryPoint(restAuthenticationEntryPoint)
             }.and()
             .addFilter(AuthFilter(authProperties, authenticationManager()))
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
@@ -38,7 +38,6 @@ class SecurityWebServletConfiguration(
             .antMatchers(HttpMethod.DELETE, *authProperties.ignoreDeletePaths).permitAll()
             .antMatchers(*MATCHERS).permitAll()
             .anyRequest().authenticated()
-            .and().httpBasic().authenticationEntryPoint(restAuthenticationEntryPoint)
     }
     
     companion object {
