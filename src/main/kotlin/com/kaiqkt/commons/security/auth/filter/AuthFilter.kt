@@ -1,16 +1,11 @@
 package com.kaiqkt.commons.security.auth.filter
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.kaiqkt.commons.security.auth.entities.Error
-import com.kaiqkt.commons.security.auth.exceptions.ErrorType
-import com.kaiqkt.commons.security.auth.exceptions.JwtExpiredException
 import com.kaiqkt.commons.security.auth.properties.AuthProperties
 import com.kaiqkt.commons.security.auth.providers.CustomerAuthProvider
 import com.kaiqkt.commons.security.auth.providers.ServiceAuthProvider
 import com.kaiqkt.commons.security.auth.token.CustomAuthentication
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
@@ -25,6 +20,7 @@ const val BEARER_PREFIX = "Bearer "
 class AuthFilter(
     private val authProperties: AuthProperties,
     authenticationManager: AuthenticationManager,
+    private val restAuthenticationEntryPoint: RestAuthenticationEntryPoint
 ) : BasicAuthenticationFilter(authenticationManager) {
 
     @Throws(IOException::class, ServletException::class)
@@ -48,12 +44,12 @@ class AuthFilter(
 
                 SecurityContextHolder.getContext().authentication = authResult
                 onSuccessfulAuthentication(request, response, authResult)
+                chain.doFilter(request, response)
+
             } catch (e: AuthenticationException) {
                 SecurityContextHolder.clearContext()
-
                 onUnsuccessfulAuthentication(request, response, e)
-            } finally {
-                chain.doFilter(request, response)
+                restAuthenticationEntryPoint.commence(request, response, e)
             }
         }
     }

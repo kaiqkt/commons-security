@@ -21,13 +21,10 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint
 class SecurityWebServletConfiguration(
     private val authProperties: AuthProperties,
     private val restAuthenticationEntryPoint: RestAuthenticationEntryPoint
-) : WebSecurityConfigurerAdapter() {
+    ) : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http
-            .exceptionHandling().apply {
-                authenticationEntryPoint(restAuthenticationEntryPoint)
-            }.and()
-            .addFilter(AuthFilter(authProperties, authenticationManager()))
+            .addFilter(AuthFilter(authProperties, authenticationManager(), restAuthenticationEntryPoint))
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .csrf().apply { disable() }.and()
             .headers().apply { disable() }.and()
