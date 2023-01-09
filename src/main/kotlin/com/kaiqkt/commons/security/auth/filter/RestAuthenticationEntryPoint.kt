@@ -33,7 +33,7 @@ class RestAuthenticationEntryPoint : AuthenticationEntryPoint {
                 response.outputStream.println(jacksonObjectMapper().writeValueAsString(error))
             }
             else -> {
-                val error = Error(ErrorType.UNKNOWN, "Unknown error")
+                val error = Error(ErrorType.UNKNOWN, authenticationException.message ?: "teste")
                 response.outputStream.println(jacksonObjectMapper().writeValueAsString(error))
             }
         }
