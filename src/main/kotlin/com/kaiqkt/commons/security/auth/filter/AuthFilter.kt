@@ -29,7 +29,6 @@ class AuthFilter(
 
     @Throws(IOException::class, ServletException::class)
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
-        val path = request.servletPath
         val accessTokenHeader = request.getHeader(AUTHORIZATION)
 
         if (accessTokenHeader.isNullOrBlank()) {

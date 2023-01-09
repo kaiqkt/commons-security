@@ -1,6 +1,7 @@
 package com.kaiqkt.commons.security.auth.config
 
 import com.kaiqkt.commons.security.auth.filter.AuthFilter
+import com.kaiqkt.commons.security.auth.filter.RestAuthenticationEntryPoint
 import com.kaiqkt.commons.security.auth.properties.AuthProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
@@ -18,7 +19,8 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableConfigurationProperties(AuthProperties::class)
 class SecurityWebServletConfiguration(
-    private val authProperties: AuthProperties
+    private val authProperties: AuthProperties,
+    private val restAuthenticationEntryPoint: RestAuthenticationEntryPoint
 ) : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http
@@ -36,6 +38,7 @@ class SecurityWebServletConfiguration(
             .antMatchers(HttpMethod.DELETE, *authProperties.ignoreDeletePaths).permitAll()
             .antMatchers(*MATCHERS).permitAll()
             .anyRequest().authenticated()
+            .and().httpBasic().authenticationEntryPoint(restAuthenticationEntryPoint)
     }
     
     companion object {
