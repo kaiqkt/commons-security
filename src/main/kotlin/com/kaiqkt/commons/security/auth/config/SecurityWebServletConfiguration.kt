@@ -36,9 +36,9 @@ class SecurityWebServletConfiguration(
             .csrf().apply { disable() }.and()
             .headers().apply { disable() }.and()
             .authorizeHttpRequests()
+            .antMatchers("/ws/**").permitAll()
             .anyRequest().authenticated()
             .and()
-            .antMatcher("/ws/**")
             .addFilter(AuthFilter(authProperties, authenticationManager(), restAuthenticationEntryPoint))
 
     }
@@ -56,8 +56,7 @@ class SecurityWebServletConfiguration(
             "/webjars/**",
             "/api-docs.yml",
             "/docs",
-            "/health",
-            "/ws/**"
+            "/health"
         )
     }
 }
