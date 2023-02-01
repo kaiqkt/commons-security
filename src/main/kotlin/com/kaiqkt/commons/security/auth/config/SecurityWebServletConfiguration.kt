@@ -22,7 +22,7 @@ class SecurityWebServletConfiguration(
     private val restAuthenticationEntryPoint: RestAuthenticationEntryPoint
 ) : WebSecurityConfigurerAdapter() {
 
-    private val MATCHERS = arrayOf(
+    private val pathMatchers = arrayOf(
         "/v2/api-docs",
         "/v3/api-docs/**",
         "/configuration/ui",
@@ -42,7 +42,7 @@ class SecurityWebServletConfiguration(
             .antMatchers(HttpMethod.POST, *authProperties.ignorePostPaths)
             .antMatchers(HttpMethod.PUT, *authProperties.ignorePutPaths)
             .antMatchers(HttpMethod.DELETE, *authProperties.ignoreDeletePaths)
-            .antMatchers(*MATCHERS)
+            .antMatchers(*pathMatchers)
     }
 
     override fun configure(http: HttpSecurity) {
