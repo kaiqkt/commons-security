@@ -38,6 +38,7 @@ class SecurityWebServletConfiguration(
             .authorizeHttpRequests()
             .anyRequest().authenticated()
             .and()
+            .antMatcher("/ws/**")
             .addFilter(AuthFilter(authProperties, authenticationManager(), restAuthenticationEntryPoint))
 
     }
