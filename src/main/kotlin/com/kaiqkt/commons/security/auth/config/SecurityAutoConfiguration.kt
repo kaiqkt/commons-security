@@ -7,5 +7,4 @@ import org.springframework.context.annotation.PropertySource
 @Configuration(proxyBeanMethods = false)
 @PropertySource("classpath:security.properties")
 @Import(value = [SecurityWebServletConfiguration::class])
-class SecurityAutoConfiguration {
-}
+class SecurityAutoConfiguration
