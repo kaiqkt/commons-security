@@ -13,7 +13,8 @@ data class AuthProperties(
     val ignoreGetPaths:Array<String> = emptyArray(),
     val ignorePostPaths: Array<String> = emptyArray(),
     val ignorePutPaths:Array<String> = emptyArray(),
-    val ignoreDeletePaths: Array<String> = emptyArray()
+    val ignoreDeletePaths: Array<String> = emptyArray(),
+    val ignoreGenericPaths: Array<String> = emptyArray()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
