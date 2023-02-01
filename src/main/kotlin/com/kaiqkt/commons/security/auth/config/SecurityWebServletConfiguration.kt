@@ -22,27 +22,13 @@ class SecurityWebServletConfiguration(
     private val restAuthenticationEntryPoint: RestAuthenticationEntryPoint
 ) : WebSecurityConfigurerAdapter() {
 
-    private val pathMatchers = arrayOf(
-        "/v2/api-docs",
-        "/v3/api-docs/**",
-        "/configuration/ui",
-        "/swagger-resources/**",
-        "/configuration/security",
-        "/swagger-ui/index.html",
-        "/swagger-ui.html",
-        "/swagger-ui/**",
-        "/webjars/**",
-        "/api-docs.yml",
-        "/docs",
-        "/health"
-    ).copyInto(authProperties.ignoreGenericPaths)
-
     override fun configure(web: WebSecurity) {
         web.ignoring().antMatchers(HttpMethod.GET, *authProperties.ignoreGetPaths)
             .antMatchers(HttpMethod.POST, *authProperties.ignorePostPaths)
             .antMatchers(HttpMethod.PUT, *authProperties.ignorePutPaths)
             .antMatchers(HttpMethod.DELETE, *authProperties.ignoreDeletePaths)
-            .antMatchers(*pathMatchers)
+            .antMatchers(*PATH_MATCHERS)
+            .antMatchers(*authProperties.ignoreGenericPaths)
     }
 
     override fun configure(http: HttpSecurity) {
@@ -54,6 +40,22 @@ class SecurityWebServletConfiguration(
             .anyRequest().authenticated()
             .and()
             .addFilter(AuthFilter(authProperties, authenticationManager(), restAuthenticationEntryPoint))
+    }
 
+    companion object {
+        private val PATH_MATCHERS = arrayOf(
+            "/v2/api-docs",
+            "/v3/api-docs/**",
+            "/configuration/ui",
+            "/swagger-resources/**",
+            "/configuration/security",
+            "/swagger-ui/index.html",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/webjars/**",
+            "/api-docs.yml",
+            "/docs",
+            "/health"
+        )
     }
 }
