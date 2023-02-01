@@ -36,7 +36,7 @@ class SecurityWebServletConfiguration(
             .csrf().apply { disable() }.and()
             .headers().apply { disable() }.and()
             .authorizeHttpRequests()
-            .antMatchers("/ws/**").permitAll()
+            .antMatchers("/ws").permitAll()
             .anyRequest().authenticated()
             .and()
             .addFilter(AuthFilter(authProperties, authenticationManager(), restAuthenticationEntryPoint))
