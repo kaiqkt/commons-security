@@ -4,6 +4,7 @@ import com.kaiqkt.commons.security.auth.properties.AuthProperties
 import com.kaiqkt.commons.security.auth.providers.CustomerAuthProvider
 import com.kaiqkt.commons.security.auth.providers.ServiceAuthProvider
 import com.kaiqkt.commons.security.auth.token.CustomAuthentication
+import com.kaiqkt.commons.security.exceptions.SecretNotProvidedException
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.AuthenticationException
@@ -34,12 +35,19 @@ class AuthFilter(
                 val customerAuth = CustomAuthentication(accessTokenHeader)
 
                 val authResult = when {
-                    accessTokenHeader.startsWith(BEARER_PREFIX) ->
+                    accessTokenHeader.startsWith(BEARER_PREFIX) -> {
+                        val customerAuthSecret = authProperties.customerAuthSigningSecret ?: throw SecretNotProvidedException("Customer")
+
                         CustomerAuthProvider(
-                            authProperties
+                            customerAuthSecret
                         ).handleCustomerAuth(customerAuth)
 
-                    else -> ServiceAuthProvider(authProperties).handleServiceAuth(customerAuth)
+                    }
+                    else -> {
+                        val serviceSharedSecret = authProperties.serviceSharedSecret ?: throw SecretNotProvidedException("Service")
+
+                        ServiceAuthProvider(serviceSharedSecret).handleServiceAuth(customerAuth)
+                    }
                 }
 
                 SecurityContextHolder.getContext().authentication = authResult

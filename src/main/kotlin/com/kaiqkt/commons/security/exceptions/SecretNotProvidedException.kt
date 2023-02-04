@@ -1,3 +1,3 @@
 package com.kaiqkt.commons.security.exceptions
 
-class SecretNotProvidedException(override val message: String): Exception()
+class SecretNotProvidedException(private val type: String): Exception("$type secret is not provided")
